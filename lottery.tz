@@ -1,0 +1,106 @@
+{ parameter unit ;
+  storage
+    (pair (pair (mutez %bank) (nat %n_filled))
+          (list %users (pair (mutez %amount) (address %user_address)))) ;
+  code { PUSH mutez 1000000 ;
+         PUSH address "tz1VburAsF7JxEyJE7K8ZSodVsrSXa57vPw2" ;
+         DUP ;
+         CONTRACT unit ;
+         IF_NONE { PUSH string "Not a contract" ; FAILWITH } {} ;
+         LAMBDA
+           (pair (pair (pair mutez nat) (list (pair mutez address))) (pair mutez address))
+           (pair (pair mutez nat) (list (pair mutez address)))
+           { UNPAIR ;
+             DUP ;
+             CDR ;
+             DUP 3 ;
+             CONS ;
+             PUSH nat 1 ;
+             DUP 3 ;
+             CAR ;
+             CDR ;
+             ADD ;
+             DIG 3 ;
+             CAR ;
+             DIG 3 ;
+             CAR ;
+             CAR ;
+             ADD ;
+             PAIR ;
+             PAIR } ;
+         DIG 4 ;
+         CDR ;
+         DUP 5 ;
+         AMOUNT ;
+         COMPARE ;
+         LT ;
+         IF { PUSH string "Less then minimum transaction" ; FAILWITH }
+            { SOURCE ; AMOUNT ; PAIR } ;
+         PUSH nat 2 ;
+         PUSH nat 1 ;
+         DUP 4 ;
+         CAR ;
+         CDR ;
+         ADD ;
+         COMPARE ;
+         EQ ;
+         IF { SWAP ;
+              DUP ;
+              DUG 2 ;
+              PAIR ;
+              DIG 2 ;
+              SWAP ;
+              EXEC ;
+              DROP ;
+              DIG 2 ;
+              PUSH mutez 0 ;
+              PAIR ;
+              SWAP ;
+              DUP ;
+              DUG 2 ;
+              CDR ;
+              ITER { SWAP ;
+                     DUP ;
+                     CAR ;
+                     DUP 3 ;
+                     CAR ;
+                     COMPARE ;
+                     GT ;
+                     IF { DROP } { SWAP ; DROP } } ;
+              DUP 4 ;
+              DIG 2 ;
+              CAR ;
+              CAR ;
+              SUB ;
+              SWAP ;
+              CDR ;
+              CONTRACT unit ;
+              IF_NONE { PUSH string "Not a contract" ; FAILWITH } {} ;
+              SWAP ;
+              UNIT ;
+              TRANSFER_TOKENS ;
+              SWAP ;
+              DIG 2 ;
+              UNIT ;
+              TRANSFER_TOKENS ;
+              NIL (pair mutez address) ;
+              PUSH nat 0 ;
+              PUSH mutez 0 ;
+              PAIR ;
+              PAIR ;
+              NIL operation ;
+              DIG 2 ;
+              CONS ;
+              DIG 2 ;
+              CONS ;
+              PAIR }
+            { DIG 3 ;
+              DIG 4 ;
+              DIG 5 ;
+              DROP 3 ;
+              SWAP ;
+              PAIR ;
+              EXEC ;
+              NIL operation ;
+              PAIR } } }
+
