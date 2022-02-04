@@ -12,12 +12,12 @@ type storage = {
 type return = operation list * storage
 
 // constants
-let n_allocated : nat = 2n
+let n_allocated : nat = 5n
 let min_amount : tez = 1tez
 let owner_commision: tez = min_amount
 
 let ownerAddress : address =
-  ("tz1VburAsF7JxEyJE7K8ZSodVsrSXa57vPw2" : address)
+  ("tz1MwT1z7i9DwNBXuHxhCTozKZGU64bYW8Cx" : address)
 
 let owner_receiver : unit contract =
     match (Tezos.get_contract_opt ownerAddress  : unit contract option) with

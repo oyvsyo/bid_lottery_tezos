@@ -3,7 +3,7 @@
     (pair (pair (mutez %bank) (nat %n_filled))
           (list %users (pair (mutez %amount) (address %user_address)))) ;
   code { PUSH mutez 1000000 ;
-         PUSH address "tz1VburAsF7JxEyJE7K8ZSodVsrSXa57vPw2" ;
+         PUSH address "tz1MwT1z7i9DwNBXuHxhCTozKZGU64bYW8Cx" ;
          DUP ;
          CONTRACT unit ;
          IF_NONE { PUSH string "Not a contract" ; FAILWITH } {} ;
@@ -36,7 +36,7 @@
          LT ;
          IF { PUSH string "Less then minimum transaction" ; FAILWITH }
             { SOURCE ; AMOUNT ; PAIR } ;
-         PUSH nat 2 ;
+         PUSH nat 5 ;
          PUSH nat 1 ;
          DUP 4 ;
          CAR ;
