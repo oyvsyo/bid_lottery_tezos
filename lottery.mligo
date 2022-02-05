@@ -58,12 +58,12 @@ let register_transaction (s, t : storage * transaction) : return =
   ([] : operation list), add_user (s, t)
 
 let make_winner (s, t : storage * transaction) : return = 
-  let _s : storage = add_user (s, t)
+  let new_s : storage = add_user (s, t)
   in
   let winner : transaction = 
-    List.fold find_largest_amount_transaction s.users empty_transaction
+    List.fold find_largest_amount_transaction new_s.users empty_transaction
   in 
-  let winner_reward : tez = s.bank - owner_commision
+  let winner_reward : tez = new_s.bank - owner_commision
   in
   let winner_receiver : unit contract =
     match (Tezos.get_contract_opt winner.user_address  : unit contract option) with

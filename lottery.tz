@@ -45,13 +45,8 @@
          COMPARE ;
          EQ ;
          IF { SWAP ;
-              DUP ;
-              DUG 2 ;
               PAIR ;
-              DIG 2 ;
-              SWAP ;
               EXEC ;
-              DROP ;
               DIG 2 ;
               PUSH mutez 0 ;
               PAIR ;
