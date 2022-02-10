@@ -5,19 +5,23 @@ type transaction = {
 }
 
 type storage = {
+    record_date: timestamp; // o.new
     bank: tez;
     n_filled: nat;
     users: transaction list;
 }
+
 type return = operation list * storage
 
 // constants
 let n_allocated : nat = 5n
 let min_amount : tez = 1tez
 let owner_commision: tez = min_amount
+let today : timestamp = Tezos.now // o.new
+let lottery_deadline : timestamp = ("2022-02-10t01:00:00Z" : timestamp) // o.new: Wed Feb 10 2022 01:00:00 GMT+0000 = 1644454800
 
 let ownerAddress : address =
-  ("tz1MwT1z7i9DwNBXuHxhCTozKZGU64bYW8Cx" : address)
+  ("tz1RWXDkL5rMs5Cdu4qTFnaSgJ53goGariUU" : address) // o.new: tenta_otto_2
 
 let owner_receiver : unit contract =
     match (Tezos.get_contract_opt ownerAddress  : unit contract option) with
@@ -25,32 +29,40 @@ let owner_receiver : unit contract =
     | None -> (failwith ("Not a contract") : (unit contract))
 
 let empty_t_list : transaction list = []
+
 let empty_transaction : transaction = {
     user_address = ownerAddress;
     amount = 0tez;
 }
+
 let empty_storage: storage = {
+    record_date = (0 : timestamp) ; // o.new
     bank = 0tez;
     n_filled = 0n;
     users = empty_t_list;
 }
+
 // test constants
 let test_transaction1 : transaction = {
     user_address = ownerAddress;
     amount = 1tez;
 }
+
 let test_transaction2 : transaction = {
     user_address = ownerAddress;
     amount = 2tez;
 }
-let test_storage : storage = {users = [test_transaction1]; n_filled = 1n; bank = 1tez}
+
+let test_storage : storage = {users = [test_transaction1]; record_date = (Tezos.now : timestamp) ; n_filled = 1n; bank = 1tez} // o.new
 
 // helper methods
 let add_user (s, t : storage * transaction) : storage = {
+    record_date = (Tezos.now : timestamp); // o.new
     bank = s.bank + t.amount;
     n_filled = s.n_filled + 1n;
     users = t :: s.users
 }
+
 let find_largest_amount_transaction (accum, t: transaction * transaction) : transaction = 
   if t.amount > accum.amount then t else accum
 
@@ -81,11 +93,13 @@ let make_winner (s, t : storage * transaction) : return =
   in
     ((operations: operation list), empty_storage)
 
-
 // main function
 let main (_p, s: unit * storage) : return  =
-  let income : transaction = if (Tezos.amount < min_amount)  then
-    failwith ("Less then minimum transaction") else {
+  let income : transaction = 
+  if (Tezos.amount < min_amount)  
+  || (today > lottery_deadline) // o.new: user enters lottery before deadline
+  then failwith ("Less then minimum transaction") 
+  else {
       user_address = Tezos.source;
       amount = Tezos.amount;
   }

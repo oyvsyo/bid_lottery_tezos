@@ -1,20 +1,26 @@
 { parameter unit ;
   storage
     (pair (pair (mutez %bank) (nat %n_filled))
-          (list %users (pair (mutez %amount) (address %user_address)))) ;
+          (pair (timestamp %record_date)
+                (list %users (pair (mutez %amount) (address %user_address))))) ;
   code { PUSH mutez 1000000 ;
-         PUSH address "tz1MwT1z7i9DwNBXuHxhCTozKZGU64bYW8Cx" ;
+         NOW ;
+         PUSH address "tz1RWXDkL5rMs5Cdu4qTFnaSgJ53goGariUU" ;
          DUP ;
          CONTRACT unit ;
          IF_NONE { PUSH string "Not a contract" ; FAILWITH } {} ;
          LAMBDA
-           (pair (pair (pair mutez nat) (list (pair mutez address))) (pair mutez address))
-           (pair (pair mutez nat) (list (pair mutez address)))
+           (pair (pair (pair mutez nat) (pair timestamp (list (pair mutez address))))
+                 (pair mutez address))
+           (pair (pair mutez nat) (pair timestamp (list (pair mutez address))))
            { UNPAIR ;
              DUP ;
              CDR ;
+             CDR ;
              DUP 3 ;
              CONS ;
+             NOW ;
+             PAIR ;
              PUSH nat 1 ;
              DUP 3 ;
              CAR ;
@@ -28,12 +34,17 @@
              ADD ;
              PAIR ;
              PAIR } ;
-         DIG 4 ;
+         DIG 5 ;
          CDR ;
-         DUP 5 ;
+         PUSH timestamp 1644454800 ;
+         DIG 5 ;
+         COMPARE ;
+         GT ;
+         DUP 6 ;
          AMOUNT ;
          COMPARE ;
          LT ;
+         OR ;
          IF { PUSH string "Less then minimum transaction" ; FAILWITH }
             { SOURCE ; AMOUNT ; PAIR } ;
          PUSH nat 5 ;
@@ -53,6 +64,7 @@
               SWAP ;
               DUP ;
               DUG 2 ;
+              CDR ;
               CDR ;
               ITER { SWAP ;
                      DUP ;
@@ -79,6 +91,8 @@
               UNIT ;
               TRANSFER_TOKENS ;
               NIL (pair mutez address) ;
+              PUSH timestamp 0 ;
+              PAIR ;
               PUSH nat 0 ;
               PUSH mutez 0 ;
               PAIR ;
